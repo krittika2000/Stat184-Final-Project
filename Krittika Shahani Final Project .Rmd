@@ -46,9 +46,8 @@ head(netflix_titles)
 #Loading the other data source
 
 library(readxl)
-netflix_data_excel_1_ <- read_excel("~/netflix_data_excel (1).xlsx")
-head(netflix_data_excel_1_) 
-
+netflix_data_excel_1_ <- read_excel("netflix_data_excel (1).xlsx")
+head(netflix_data_excel_1_)
 
 ```
 
@@ -105,7 +104,6 @@ names(ratings) [3] <- "content"
 
 #visualisation
 ggplot(data=ratings,aes(x=rating,y=content ,fill=content))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=60,hjust=1))+ facet_wrap(~type,ncol=3)+ggtitle("Rating according to content type")
-
 ```
 
 
@@ -141,7 +139,7 @@ ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_
 
 This shows the duration of the movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
 
-```{r}
+```{r,warning=FALSE}
 
 CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
 
@@ -184,11 +182,12 @@ ggplot(data=most_popular,aes(x=releaseyear,y=ratingDescription))+geom_point()+ae
 
 ** Through the scatter plot above we not only get to see in which year what kind of movies are produced and for the type of audience but also how many of them are released on Netflix. For example if we see the key to the right that gives us the count of the movies . So in 2018 more than 100 movies of the rating description 87 were released on Netflix(the light blue dot). **
 
+
 ### Which 10 genres of movies are most popular amongst people over the years based on user rating score
 
 Just like we had a graph above that gave top 10 genres releasedby Netflix , this data actually gives us the genres that have been top rated by the people themselves. Over the years , the movies and content type on Netflix have been watched by people and have been given ratings. This analysis is based on those ratings. So let's take a look at the global response of the people . 
 
-The rating scores follow the general norm- the higher the rating (out of a total of 100) the more the people have liked the movie
+The rating scores follow the general norm- the higher the rating (out of a total of 100) the more the people have liked the movie.
 
 ```{r,fig.height=7}
 
@@ -206,7 +205,6 @@ popular<-
 ggplot(data=popular,aes(x=listed_in,y=count,order=reorder(releaseyear,releaseyear),fill=user_rating_score))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=60,hjust=1))
 
 ggplot(data=popular,aes(x=releaseyear,y=user_rating_score,order=reorder(releaseyear,releaseyear),fill=listed_in))+geom_bar(stat='identity',position='stack', width=.9)
-
 
 ```
 
