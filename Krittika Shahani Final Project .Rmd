@@ -1,0 +1,229 @@
+---
+title: "FINAL PROJECT- NETFLIX DATA"
+output: html_notebook
+---
+
+##Research question 
+
+**What has been the global transition in the content on Netflix in terms of TV shows to Movies over the years ?**
+
+*Why I chose this topic* : In a day and age where everything is controlled by the internet , Netflix has taken over the entertainment industry and has been prevailing like no ohter platform before. Netflix provides a place for all kinds of content - web series , TV shows, Movies ,Documentries ,etc. 
+
+The main reason why Netflix is so popular is because is accessible by people all over the world and caters to almost all age groups and genres . 
+
+It would be very interesting to see how the content has changed over the years globally (while also analysing factors like duration and genres,etc.)
+
+###Other guiding Questions :
+
+1) The top 10 genres over the years
+2) The mean/average/typical durations of Movies and TV shows in the Top 10 countries
+3) The kind of content being released in the different countries , i.e. base on rating 
+4) Is there any correlation between genres and ratings or duration and rating 
+
+
+```{r}
+#loading the libraries that will be needed in the project
+library(DataComputing)
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(mosaicData)
+library(mosaic)
+library(ggpubr)
+
+```
+
+
+####Accessing the 2 data sources 
+```{r}
+#Loading the primary data source
+library(readr)
+
+netflix_titles <- read_csv("netflix_titles.csv")
+head(netflix_titles)
+
+#Loading the other data source
+
+library(readxl)
+netflix_data_excel_1_ <- read_excel("~/netflix_data_excel (1).xlsx")
+head(netflix_data_excel_1_) 
+
+
+```
+
+####Cleaning the data 
+
+While working with huge amounts of unfiltered raw data , sometimes we encounter a lots of missing values, values like date and time that have not been formatted correctly. 
+In order to run our data wrangling codes and get good visuals it is important for us to filter and clean the data before we put it to use. It is also important to nullify unimportant data.
+```{r}
+#cleaning the data and droppping show_id column
+netflix_titles = subset(netflix_titles, select = -c(show_id,description) )
+
+#Changing the below variables in categorical variables
+netflix_titles$rating <- as.factor(netflix_titles$rating)
+netflix_titles$listed_in <- as.factor(netflix_titles$listed_in)
+netflix_titles$type <- as.factor(netflix_titles$type)
+
+```
+
+
+##Division based on Content Type on Netflix 
+
+Let's first take a look at the two braod components that the content on Netflix can be divided into - mainly **Movies** and **TV Shows**
+
+We can see the proportion of each easily through the pi chart below!
+
+```{r}
+count_by_type <- 
+  netflix_titles%>%
+  group_by(type) %>%
+  summarise(count = n())
+
+# Data visualisation
+ggplot(count_by_type, aes(x='', y=count, fill=type)) + ggtitle("Amount of Netflix Content by Type") +geom_bar(stat="identity", width=1) +coord_polar("y", start=0) + theme_void()
+
+```
+
+**It can clearly be seen that the number of movies is much more on Netflix than TV Shows**
+
+
+###Division of content type in all countries based on the rating
+
+In this part of the analysis , we can see based on each rating - how many of them are movies and how many are TV Shows.
+We can also see which rating is most popular in movies and which is most popular in TV Show.
+
+```{r}
+#wrangling by rating type 
+ratings <-netflix_titles %>%
+  group_by(rating, type) %>% 
+  summarise(content_num = n()) %>% 
+  arrange(desc(content_num))
+names(ratings) [1] <- "rating"
+names(ratings) [2] <- "type"
+names(ratings) [3] <- "content"
+
+#visualisation
+ggplot(data=ratings,aes(x=rating,y=content ,fill=content))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=60,hjust=1))+ facet_wrap(~type,ncol=3)+ggtitle("Rating according to content type")
+
+```
+
+
+** The TV-MA has the highest number of movies with that rating . TV Shows also has TV-MA as the highest rating**
+
+
+## Top 10 Genres globally , over the years 
+
+Let's now take a look at the Top 10 genres that have been produced over the years. 
+This gives us an idea as to which demographic is mostly catered to by Netflix and which type of content has been in high demand and hence been produced by Netflix!
+
+```{r}
+#code to find top 10 genres from the netfilx_titles table
+Top10<-
+  netflix_titles %>%
+    group_by(listed_in)%>%
+    summarise(total=n())%>%
+    arrange(desc(total)) %>%
+    head(10)
+
+Top10
+```
+
+```{r,fig.height=7}
+
+#par(mar=c(10,10,10,10))
+ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=90,hjust=1))+xlab("Genres")+ylab("Count")
+
+```
+
+
+### Duration of the movies released over the years in the top 10 Countries
+
+This shows the duration of the movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
+
+```{r}
+
+CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
+
+ s4 <- strsplit(CountryM_Duration$country, split = ", ")
+ 
+  CountryM_Duration_full <- data.frame(duration = rep(CountryM_Duration$duration, sapply(s4, length)), country = unlist(s4))
+  
+  CountryM_Duration_full$duration <- as.numeric(gsub(" min","", CountryM_Duration_full$duration))
+
+  CountryM_Duration_full_subset<-CountryM_Duration_full[CountryM_Duration_full$country %in% c("United States", "India", "United Kingdom", "Canada", "France", "Japan", "Spain", "South Korea", "Mexico", "Australia"),]
+```
+
+
+#### Graph(box and whishker plot) showing duration of movies in top 10 countries
+```{r}
+CountryM_Duration_full_subset%>%
+  ggplot(aes(x=country,y=duration,fill=country))+geom_boxplot()+theme(axis.text.x=element_text(angle=60,hjust=1))+xlab("Country")+ylab("Duration(in min)")
+
+
+```
+
+**From this data we can see that the mean duration for most movies is about 120/130 minutes. Even though there are some outliers , but our data is not very much influenced as the number of movies of the 2hour duration are much more**
+
+
+### In each year what kinds of movies were released based on Rating Desription
+
+In the table "netflix_data_excel" the rating level/genres also have a corrensponding ratingDescription which is a quantitative variable . It has various levels like 10: movies that are suitable for all ages and 110 which are movies only suitable for adults and not for children . So the higher the number the less suitable the movie is for a universal audience that include children. 
+
+The graph below shows the various kinds of movies and the number of them that have been produced on Netflix.
+
+```{r}
+most_popular <- 
+  netflix_data_excel_1_ %>%
+  group_by(ratingDescription,releaseyear) %>% 
+  summarise(count = n())
+
+
+ggplot(data=most_popular,aes(x=releaseyear,y=ratingDescription))+geom_point()+aes(colour=count) 
+```
+
+** Through the scatter plot above we not only get to see in which year what kind of movies are produced and for the type of audience but also how many of them are released on Netflix. For example if we see the key to the right that gives us the count of the movies . So in 2018 more than 100 movies of the rating description 87 were released on Netflix(the light blue dot). **
+
+### Which 10 genres of movies are most popular amongst people over the years based on user rating score
+
+Just like we had a graph above that gave top 10 genres releasedby Netflix , this data actually gives us the genres that have been top rated by the people themselves. Over the years , the movies and content type on Netflix have been watched by people and have been given ratings. This analysis is based on those ratings. So let's take a look at the global response of the people . 
+
+The rating scores follow the general norm- the higher the rating (out of a total of 100) the more the people have liked the movie
+
+```{r,fig.height=7}
+
+joining_tb<-
+  left_join(netflix_data_excel_1_,netflix_titles,by=c("title"="title"))
+
+popular<-
+  joining_tb%>%
+  na.omit(joining_tb)%>%
+  group_by(listed_in,user_rating_score,releaseyear)%>%
+  summarise(count=n())%>%
+  arrange(desc(user_rating_score))%>%
+  head(10)
+
+ggplot(data=popular,aes(x=listed_in,y=count,order=reorder(releaseyear,releaseyear),fill=user_rating_score))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=60,hjust=1))
+
+ggplot(data=popular,aes(x=releaseyear,y=user_rating_score,order=reorder(releaseyear,releaseyear),fill=listed_in))+geom_bar(stat='identity',position='stack', width=.9)
+
+
+```
+
+###correlation
+
+```{r}
+cor.test(joining_tb$ratingDescription,joining_tb$user_rating_score,method="pearson")
+
+```
+
+
+
+
+
+
+
+
+#####Primary Source : https://www.kaggle.com/shivamb/netflix-shows 
+#####Other Sources : https://data.world/chasewillden/netflix-shows
+
