@@ -75,10 +75,11 @@ netflix_titles$type <- as.factor(netflix_titles$type)
 ```
 
 
+
 ###Division based on Content Type on Netflix 
 
 Let's first take a look at the two broad components that the content on Netflix can be divided into - mainly **Movies** and **TV Shows**
-We can see the proportion of each easily through the pie chart below!
+We can see the proportion of each easily through the pie chart below!  
 
 ```{r,message=FALSE}
 ##diving by content type
@@ -92,7 +93,9 @@ ggplot(count_by_type, aes(x='', y=count, fill=type)) + ggtitle("Amount of Netfli
 
 ```
 
-**It can clearly be seen that the number of movies is much more on Netflix than TV Shows**
+**It can clearly be seen that the number of movies is much more on Netflix than TV Shows**  
+
+
 
 
 ###Division of rating on the two types of content on Netflix
@@ -118,7 +121,8 @@ ggplot(data=ratings,aes(x=rating,y=content ,fill=content))+geom_bar(stat='identi
 **The TV-MA has the highest number of movies with that rating . TV Shows also has TV-MA as the highest rating**
 
 
-## Top 10 Genres globally , over the years(based on total count on Netflix) 
+
+###Top 10 Genres globally , over the years(based on total count on Netflix) 
 
 Let's now take a look at the Top 10 genres that have been produced over the years. 
 This gives us an idea as to which demographic is mostly catered to by Netflix and which type of content has been in high demand and hence been produced by Netflix !
@@ -142,6 +146,8 @@ ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_
 
 ```
 **As we see from the graph Documentries lead the charts, with Stand up comedy as a close second and so on**
+
+
 
 ### Duration of the movies released over the years in the top 10 Countries
 
@@ -176,6 +182,7 @@ CountryM_Duration_full_subset%>%
 **From this data we can see that the mean duration for most movies is about 120/130 minutes. Even though there are some outliers ,our data is not very much influenced as the number of movies of the 2hour duration are much more**
 
 
+
 ### In each year what kinds of movies were released based on Rating Desription
 
 In the table "netflix_data_excel" the rating level/genres also have a corrensponding ratingDescription which is a quantitative variable . It has various levels like , 10: movies that are suitable for all ages and 110 which are movies only suitable for adults and not for children . So the higher the number the less suitable the movie is for a universal audience that include children. 
@@ -194,6 +201,8 @@ ggplot(data=most_popular,aes(x=releaseyear,y=ratingDescription))+geom_point()+ae
 ```
 
 **Through the scatter plot above we not only get to see in which year what kind of movies are produced and for the type of audience but also how many of them are released on Netflix. For example if we see the key to the right that gives us the count of the movies . So in 2018 more than 100 movies of the rating description 87 were released on Netflix(the light blue dot)**
+
+
 
 
 ### Which 10 genres of movies are most popular amongst people over the years based on user rating score
@@ -220,7 +229,7 @@ ggplot(data=popular,aes(x=listed_in,y=count,order=reorder(releaseyear,releaseyea
 ```
 **Our visual analysis tells us that TV Dramas and Crime TV Shows have been given highest rating , but the audience for Children and family movies are more in number and hence more number of people have rated it**
 
-##Which year had the highest content rating according to the ratings given by people?
+### Which year had the highest content rating according to the ratings given by people?
 The graph below shows year wise , the content user rating that was given to movies on Netflix. 
 The graph shows us the transition of how many ratings people gave and thereby shows us how many shows people watched . 
 
@@ -248,6 +257,7 @@ ggplot( data = popular, aes(x = releaseyear)) + geom_density(adjust = 0.4) + aes
 ```
 
 
+
 ###Testing correlation between Rating Description and User ratings 
 
 This is a correlation test that shows if the rating description(i.e.kind of movies- universal or adult) is in any way related to how high the user rating is ! 
@@ -261,7 +271,7 @@ cor.test(joining_tb$ratingDescription,joining_tb$user_rating_score,method="pears
 **The correlation coefficient 0.25 is pretty low , hence it can be concluded that there is barely any factor that affects both values**
 
 
-##Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score for each kind of content from the people !
+### Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score for each kind of content from the people !
 ```{r,message=FALSE}
 avg_data<-
   netflix_data_excel_1_ %>%
@@ -274,9 +284,9 @@ avg_data
 ```
 
 ###Problems I came accross and how I overcame it:
-The first issue that I came accross was that the data sets I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts)or so. This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
+The first issue that I came across was that the data sets I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts)or so. This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
 
-##Conclusion:
+### Conclusion:
 In conclusion I would like to state that my analysis was based on a lot of factors that affect the content on Netflix- like content type(movie or tv show), the duration of the content, the rating given by netflix,the genres and the rating given by people . 
 
 Over the years the content on Netflix has transitioned so much : genres have changed by becoming available in many languages(thereby catering to various countries) , they have also been created in such a way that a child, a teen, an adults and the older generation can enjoy Netflix in their respective ways !
@@ -284,7 +294,7 @@ We can see that gradually progressing through the years, the audience numbers ha
 
 
 
-##Data Sources and sites:(citation)
+### Data Sources and sites:(citation)
 #####Primary Source : https://www.kaggle.com/shivamb/netflix-shows 
 #####Other Sources : https://data.world/chasewillden/netflix-shows
 
