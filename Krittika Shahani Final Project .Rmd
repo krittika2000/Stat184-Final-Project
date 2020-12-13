@@ -1,6 +1,7 @@
 ---
 title: "FINAL PROJECT- NETFLIX DATA"
 output: html_notebook
+author: "[Krittika Shahani](https://krittika2000.github.io/Stat184-Final-Project/)"
 ---
 
 ##Research question 
@@ -19,6 +20,12 @@ It would be very interesting to see how the content has changed over the years g
 2) The mean/average/typical durations of Movies and TV shows in the Top 10 countries
 3) The kind of content being released in the different countries , i.e. base on rating 
 4) Is there any correlation between genres and ratings or duration and rating 
+
+##The two sets of data I am using :
+The pimary data scource lists the statistics and numbers based on content that Netflix produces
+My secondary data source analyses the data of Netflix content based on the ratings given by the people . 
+
+I have tried looking and analysis data and questions from both points of view !
 
 
 ```{r,message=FALSE}
@@ -139,7 +146,7 @@ ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_
 
 This shows the duration of the movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
 
-```{r,warning=FALSE}
+```{r,warning=FALSE,message=FALSE}
 ##calculating duration of movies based on top 10 countries
 CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
 
@@ -214,7 +221,7 @@ The graph shows us the transition of how many ratings people gave and thereby sh
 
 It's interesting to see that till about 2010 it was mostly chilrens content that got high ratings . After 2012 there were very high ratings given to Drama's and Sci-Fi movies as well!
 
-```{r, results=FALSE}
+```{r,warning=FALSE,message=FALSE}
 ##grouping data based on release year and user rating
 popular<-
   joining_tb%>%
@@ -222,10 +229,12 @@ popular<-
   group_by(listed_in,user_rating_score,releaseyear)%>%
   summarise(count=n())%>%
   arrange(desc(user_rating_score))
+```
+
+```{r,warning=FALSE,message=FALSE}
 ##spreading the table to get an idea - year wise
 popular%>%
   spread(key=releaseyear,value = user_rating_score)
-
 ```
 
 ```{r,warning=FALSE,fig.height=7}
@@ -248,12 +257,13 @@ cor.test(joining_tb$ratingDescription,joining_tb$user_rating_score,method="pears
 **The correlation coefficient 0.25 is pretty low , hence it can be concluded that there is barely any factor that affects both values**
 
 
-##Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score!
+##Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score for each kind of content from the people !
 ```{r}
 avg_data<-
   netflix_data_excel_1_ %>%
-  summarise(avg= mean(user_rating_size, na.rm = TRUE),
-            scr= mean(user_rating_score))
+  group_by(ratingLevel)%>%
+  summarise(avg_size= mean(user_rating_size, na.rm = TRUE),
+            avg_scores= mean(user_rating_score))
 avg_data
 
 
@@ -263,7 +273,7 @@ avg_data
 The first issue that I came accross was that the data set I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts). This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
 
 
-##Data Sources and sites:
+##Data Sources and sites:(citation)
 #####Primary Source : https://www.kaggle.com/shivamb/netflix-shows 
 #####Other Sources : https://data.world/chasewillden/netflix-shows
 
