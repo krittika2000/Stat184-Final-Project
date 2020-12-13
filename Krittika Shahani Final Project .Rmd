@@ -1,5 +1,5 @@
 ---
-title: "FINAL PROJECT- NETFLIX DATA"
+title: "FINAL PROJECT- ANALYSIS OF NETFLIX DATA"
 output: html_notebook
 author: "[Krittika Shahani](https://krittika2000.github.io/Stat184-Final-Project/)"
 ---
@@ -8,24 +8,25 @@ author: "[Krittika Shahani](https://krittika2000.github.io/Stat184-Final-Project
 
 **What has been the global transition in the content on Netflix in terms of TV shows to Movies over the years ?**
 
-***Why I chose this topic*** : In a day and age where everything is controlled by the internet , Netflix has taken over the entertainment industry and has been prevailing like no ohter platform before. Netflix provides a place for all kinds of content - web series , TV shows, Movies ,Documentries ,etc. 
+***Why I chose this topic*** : In a day and age where everything is controlled by the internet , Netflix has taken over the entertainment industry and has been prevailing like no other platform before. Netflix provides a place for all kinds of content - web series , TV shows, Movies ,Documentries ,etc. 
 
-The main reason why Netflix is so popular is because is accessible by people all over the world and caters to almost all age groups and genres . 
+The main reason why Netflix is so popular is because it is accessible by people all over the world and caters to almost all age groups and genres . 
 
-It would be very interesting to see how the content has changed over the years globally (while also analysing factors like duration and genres,etc.)
+It would be very interesting to see how the content has changed over the years(around 10-15) globally (while also analysing factors like duration and genres,etc.)
 
 ####Other guiding Questions :
 
 1) The top 10 genres over the years
-2) The mean/average/typical durations of Movies and TV shows in the Top 10 countries
-3) The kind of content being released in the different countries , i.e. base on rating 
-4) Is there any correlation between genres and ratings or duration and rating 
+2) The mean/average/typical durations of Movies and TV shows in the Top 10 countries according to viewership
+3) The kind of content being released in the different countries , i.e. based on rating 
+4) Is there any correlation between genres and ratings or duration and ratings ? 
 
 ##The two sets of data I am using :
-The pimary data scource lists the statistics and numbers based on content that Netflix produces
-My secondary data source analyses the data of Netflix content based on the ratings given by the people . 
+The primary data scource lists the statistics and numbers based on content that Netflix produces.
 
-I have tried looking and analysis data and questions from both points of view !
+My secondary data source analyses the data of Netflix content based on the ratings given by people . 
+
+I have tried looking and analysing the data and questions from both points of view !
 
 
 ```{r,message=FALSE}
@@ -59,8 +60,9 @@ head(netflix_data_excel_1_)
 
 ####Cleaning the data 
 
-While working with huge amounts of unfiltered raw data , sometimes we encounter a lots of missing values, values like date and time that have not been formatted correctly. 
+While working with huge amounts of unfiltered raw data , sometimes we encounter lots of missing values, values like date and time that have not been formatted correctly. 
 In order to run our data wrangling codes and get good visuals it is important for us to filter and clean the data before we put it to use. It is also important to nullify unimportant data.
+
 ```{r}
 #cleaning the data and droppping show_id and description columns
 netflix_titles = subset(netflix_titles, select = -c(show_id,description) )
@@ -75,11 +77,10 @@ netflix_titles$type <- as.factor(netflix_titles$type)
 
 ###Division based on Content Type on Netflix 
 
-Let's first take a look at the two braod components that the content on Netflix can be divided into - mainly **Movies** and **TV Shows**
+Let's first take a look at the two broad components that the content on Netflix can be divided into - mainly **Movies** and **TV Shows**
+We can see the proportion of each easily through the pie chart below!
 
-We can see the proportion of each easily through the pi chart below!
-
-```{r}
+```{r,message=FALSE}
 ##diving by content type
 count_by_type <- 
   netflix_titles%>%
@@ -96,10 +97,10 @@ ggplot(count_by_type, aes(x='', y=count, fill=type)) + ggtitle("Amount of Netfli
 
 ###Division of rating on the two types of content on Netflix
 
-In this part of the analysis , we can see based on each rating - how many of them are movies and how many are TV Shows.
-We can also see which rating is most popular in movies and which is most popular in TV Show.
+In this part of the analysis , we can use the graph to show that based on each rating - how many of them are movies and how many are TV Shows.
+We can also see which rating is most popular in movies and which is most popular in TV Shows.
 
-```{r}
+```{r,message=FALSE}
 #wrangling by rating type 
 ratings <-netflix_titles %>%
   group_by(rating, type) %>% 
@@ -117,12 +118,12 @@ ggplot(data=ratings,aes(x=rating,y=content ,fill=content))+geom_bar(stat='identi
 **The TV-MA has the highest number of movies with that rating . TV Shows also has TV-MA as the highest rating**
 
 
-## Top 10 Genres globally , over the years 
+## Top 10 Genres globally , over the years(based on total count on Netflix) 
 
 Let's now take a look at the Top 10 genres that have been produced over the years. 
-This gives us an idea as to which demographic is mostly catered to by Netflix and which type of content has been in high demand and hence been produced by Netflix!
+This gives us an idea as to which demographic is mostly catered to by Netflix and which type of content has been in high demand and hence been produced by Netflix !
 
-```{r}
+```{r,message=FALSE}
 #code to find top 10 genres from the netfilx_titles table
 Top10<-
   netflix_titles %>%
@@ -137,46 +138,51 @@ Top10
 ```{r,fig.height=7}
 
 #par(mar=c(10,10,10,10))
-ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=90,hjust=1))+xlab("Genres")+ylab("Count")
+ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=90,hjust=1))+xlab("Genres")+ylab("Count")+ggtitle("Top 10 Genres globally")
 
 ```
-
+**As we see from the graph Documentries lead the charts, with Stand up comedy as a close second and so on**
 
 ### Duration of the movies released over the years in the top 10 Countries
 
-This shows the duration of the movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
+This shows the duration of movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
 
 ```{r,warning=FALSE,message=FALSE}
 ##calculating duration of movies based on top 10 countries
-CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
-
- s4 <- strsplit(CountryM_Duration$country, split = ", ")
+CountryM_Duration<-
+  na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
+##regex for splitting
+ s1 <- 
+   strsplit(CountryM_Duration$country, split = ", ")
  
-  CountryM_Duration_full <- data.frame(duration = rep(CountryM_Duration$duration, sapply(s4, length)), country = unlist(s4))
-  
-  CountryM_Duration_full$duration <- as.numeric(gsub(" min","", CountryM_Duration_full$duration))
-
-  CountryM_Duration_full_subset<-CountryM_Duration_full[CountryM_Duration_full$country %in% c("United States", "India", "United Kingdom", "Canada", "France", "Japan", "Spain", "South Korea", "Mexico", "Australia"),]
+  CountryM_Duration_full <- 
+    data.frame(duration = rep(CountryM_Duration$duration, sapply(s1, length)), country = unlist(s1))
+#converting to nummeric  
+  CountryM_Duration_full$duration <-
+    as.numeric(gsub(" min","", CountryM_Duration_full$duration))
+#top 10 country names
+  CountryM_Duration_full_subset<-
+    CountryM_Duration_full[CountryM_Duration_full$country %in% c("United States", "India", "United Kingdom", "Canada", "France", "Japan", "Spain", "South Korea", "Mexico", "Australia"),]
 ```
 
 
 
-```{r}
+```{r,fig.height=6}
 ##Graph(box and whishker plot) showing duration of movies in top 10 countries
 CountryM_Duration_full_subset%>%
   ggplot(aes(x=country,y=duration,fill=country))+geom_boxplot()+theme(axis.text.x=element_text(angle=60,hjust=1))+xlab("Country")+ylab("Duration(in min)")+ggtitle("Duration of the movies released over the years in the top 10 Countries")
 ```
 
-**From this data we can see that the mean duration for most movies is about 120/130 minutes. Even though there are some outliers , but our data is not very much influenced as the number of movies of the 2hour duration are much more**
+**From this data we can see that the mean duration for most movies is about 120/130 minutes. Even though there are some outliers ,our data is not very much influenced as the number of movies of the 2hour duration are much more**
 
 
 ### In each year what kinds of movies were released based on Rating Desription
 
-In the table "netflix_data_excel" the rating level/genres also have a corrensponding ratingDescription which is a quantitative variable . It has various levels like 10: movies that are suitable for all ages and 110 which are movies only suitable for adults and not for children . So the higher the number the less suitable the movie is for a universal audience that include children. 
+In the table "netflix_data_excel" the rating level/genres also have a corrensponding ratingDescription which is a quantitative variable . It has various levels like , 10: movies that are suitable for all ages and 110 which are movies only suitable for adults and not for children . So the higher the number the less suitable the movie is for a universal audience that include children. 
 
 The graph below shows the various kinds of movies and the number of them that have been produced on Netflix.
 
-```{r}
+```{r,message=FALSE}
 ##finding rating description over the years
 most_popular <- 
   netflix_data_excel_1_ %>%
@@ -192,11 +198,11 @@ ggplot(data=most_popular,aes(x=releaseyear,y=ratingDescription))+geom_point()+ae
 
 ### Which 10 genres of movies are most popular amongst people over the years based on user rating score
 
-Just like we had a graph above that gave top 10 genres releasedby Netflix , this data actually gives us the genres that have been top rated by the people themselves. Over the years , the movies and content type on Netflix have been watched by people and have been given ratings. This analysis is based on those ratings. So let's take a look at the global response of the people . 
+Just like we had a graph above that gave top 10 genres released by Netflix , this data actually gives us the genres that have been top rated by the people themselves. Over the years , the movies and content type on Netflix have been watched by people and have been given ratings. This analysis is based on those ratings. So let's take a look at the global response of the people . 
 
 The rating scores follow the general norm- the higher the rating (out of a total of 100) the more the people have liked the movie.
 
-```{r,fig.height=7}
+```{r,fig.height=7,message=FALSE}
 ##joining tables by title to find common movies
 joining_tb<-
   left_join(netflix_data_excel_1_,netflix_titles,by=c("title"="title"))
@@ -212,14 +218,13 @@ popular<-
 
 ggplot(data=popular,aes(x=listed_in,y=count,order=reorder(releaseyear,releaseyear),fill=user_rating_score))+geom_bar(stat='identity',position='stack', width=.9) + theme(axis.text.x=element_text(angle=60,hjust=1))
 ```
+**Our visual analysis tells us that TV Dramas and Crime TV Shows have been given highest rating , but the audience for Children and family movies are more in number and hence more number of people have rated it**
 
-
-##Which year had the highest content rating ?
-
-Thr graph below shows year wise , the content user rating that was given to movies on Netflix. 
+##Which year had the highest content rating according to the ratings given by people?
+The graph below shows year wise , the content user rating that was given to movies on Netflix. 
 The graph shows us the transition of how many ratings people gave and thereby shows us how many shows people watched . 
 
-It's interesting to see that till about 2010 it was mostly chilrens content that got high ratings . After 2012 there were very high ratings given to Drama's and Sci-Fi movies as well!
+**It's interesting to see that till about 2010 it was mostly chilrens content that got high ratings . After 2012 there were very high ratings given to Drama's and Sci-Fi movies as well!In total the years 2015 and 2018 had highest count of ratings.**
 
 ```{r,warning=FALSE,message=FALSE}
 ##grouping data based on release year and user rating
@@ -245,8 +250,7 @@ ggplot( data = popular, aes(x = releaseyear)) + geom_density(adjust = 0.4) + aes
 
 ###Testing correlation between Rating Description and User ratings 
 
-This is just a correlation test that shows if the rating description(i.e.kind of movies- universal or adult) is in any way related to how high the user rating is ! 
-
+This is a correlation test that shows if the rating description(i.e.kind of movies- universal or adult) is in any way related to how high the user rating is ! 
 
 ```{r}
 ##finding correlation coefficient by pearson's method 
@@ -258,7 +262,7 @@ cor.test(joining_tb$ratingDescription,joining_tb$user_rating_score,method="pears
 
 
 ##Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score for each kind of content from the people !
-```{r}
+```{r,message=FALSE}
 avg_data<-
   netflix_data_excel_1_ %>%
   group_by(ratingLevel)%>%
@@ -270,7 +274,14 @@ avg_data
 ```
 
 ###Problems I came accross and how I overcame it:
-The first issue that I came accross was that the data set I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts). This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
+The first issue that I came accross was that the data sets I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts)or so. This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
+
+##Conclusion:
+In conclusion I would like to state that my analysis was based on a lot of factors that affect the content on Netflix- like content type(movie or tv show), the duration of the content, the rating given by netflix,the genres and the rating given by people . 
+
+Over the years the content on Netflix has transitioned so much : genres have changed by becoming available in many languages(thereby catering to various countries) , they have also been created in such a way that a child, a teen, an adults and the older generation can enjoy Netflix in their respective ways !
+We can see that gradually progressing through the years, the audience numbers have increased(given more ratings)and so have the numbers of movies and TV shows. 
+
 
 
 ##Data Sources and sites:(citation)
