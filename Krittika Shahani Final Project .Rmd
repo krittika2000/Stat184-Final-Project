@@ -21,7 +21,7 @@ It would be very interesting to see how the content has changed over the years g
 4) Is there any correlation between genres and ratings or duration and rating 
 
 
-```{r}
+```{r,message=FALSE}
 #loading the libraries that will be needed in the project
 library(DataComputing)
 library(tidyverse)
@@ -140,7 +140,7 @@ ggplot(data=Top10,aes(x=reorder(listed_in,total),y=total ,fill=listed_in))+geom_
 This shows the duration of the movies in the top 10 countries . It is important to take a look at this data as we can analyse if movies that are longer are more popular or do people like watching short movies. 
 
 ```{r,warning=FALSE}
-##calculating duration based on top 10 countries
+##calculating duration of movies based on top 10 countries
 CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("country", "duration")]) 
 
  s4 <- strsplit(CountryM_Duration$country, split = ", ")
@@ -158,8 +158,6 @@ CountryM_Duration<-na.omit(netflix_titles[netflix_titles$type=="Movie",][,c("cou
 ##Graph(box and whishker plot) showing duration of movies in top 10 countries
 CountryM_Duration_full_subset%>%
   ggplot(aes(x=country,y=duration,fill=country))+geom_boxplot()+theme(axis.text.x=element_text(angle=60,hjust=1))+xlab("Country")+ylab("Duration(in min)")+ggtitle("Duration of the movies released over the years in the top 10 Countries")
-
-
 ```
 
 **From this data we can see that the mean duration for most movies is about 120/130 minutes. Even though there are some outliers , but our data is not very much influenced as the number of movies of the 2hour duration are much more**
@@ -248,6 +246,18 @@ cor.test(joining_tb$ratingDescription,joining_tb$user_rating_score,method="pears
 ```
 
 **The correlation coefficient 0.25 is pretty low , hence it can be concluded that there is barely any factor that affects both values**
+
+
+##Analysis and calculation of the average number of people who are actually rating the content on Netflix and the Average rating score!
+```{r}
+avg_data<-
+  netflix_data_excel_1_ %>%
+  summarise(avg= mean(user_rating_size, na.rm = TRUE),
+            scr= mean(user_rating_score))
+avg_data
+
+
+```
 
 ###Problems I came accross and how I overcame it:
 The first issue that I came accross was that the data set I was running my codes on , were too large to construct a plot on . In some cases I was getting an error and no output visualisation. To overcome this problem , in some questions , I had to reduce the size of the data being analysed , i.e. base my analysis on the top 10 (10 most important and largest counts). This way my calculations weren't affected too much and also I was able to get a good visualisation and set the scale. 
